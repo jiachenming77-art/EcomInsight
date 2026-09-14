@@ -1,0 +1,67 @@
+metrics:
+  gmv:
+    label: GMV
+    description: 有效支付订单金额合计
+    entity: order
+    measure: amount
+    aggregation: sum
+    filters:
+      - {field: order_status, op: in, value: [paid, completed, 支付成功, 已完成]}
+      - {field: amount, op: gt, value: 0}
+    unit: currency
+    required_fields: [order_id, amount]
+    version: 1
+  paid_orders:
+    label: 支付订单数
+    entity: order
+    measure: order_id
+    aggregation: count_distinct
+    filters:
+      - {field: order_status, op: in, value: [paid, completed, 支付成功, 已完成]}
+    unit: count
+    required_fields: [order_id]
+    version: 1
+  paid_users:
+    label: 支付用户数
+    entity: user
+    measure: user_id
+    aggregation: count_distinct
+    filters:
+      - {field: order_status, op: in, value: [paid, completed, 支付成功, 已完成]}
+    unit: count
+    required_fields: [user_id]
+    version: 1
+  units:
+    label: 销量
+    entity: order_item
+    measure: quantity
+    aggregation: sum
+    filters: []
+    unit: count
+    required_fields: [quantity]
+    version: 1
+  aov:
+    label: 客单价
+    description: GMV / 支付订单数
+    entity: order
+    expression: gmv / paid_orders
+    unit: currency_per_order
+    required_fields: [amount, order_id]
+    zero_division: null
+    version: 1
+  gmv_per_paid_user:
+    label: 支付用户人均GMV
+    entity: user
+    expression: gmv / paid_users
+    unit: currency_per_user
+    required_fields: [amount, user_id]
+    zero_division: null
+    version: 1
+  orders_per_paid_user:
+    label: 支付用户人均订单数
+    entity: user
+    expression: paid_orders / paid_users
+    unit: orders_per_user
+    required_fields: [order_id, user_id]
+    zero_division: null
+    version: 1

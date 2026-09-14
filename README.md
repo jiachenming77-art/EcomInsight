@@ -1,4 +1,96 @@
-## 欢迎关注
+# EcomInsight
+
+**面向电商场景的证据驱动 AI 商业分析 Copilot。**
+
+EcomInsight 基于 [xiaomaxueshufen/data-analysis](https://github.com/xiaomaxueshufen/data-analysis) 二次开发。它把业务问题转换为受约束的分析计划，通过统一指标语义层执行确定性计算，并为每个关键结果保留可复现证据。项目仅用于非商业学习、研究和个人作品集，完整许可与贡献边界见 [LICENSE](LICENSE) 和 [NOTICE.md](NOTICE.md)。
+
+## EcomInsight 新增能力
+
+- **Metric Semantic Layer**：将异构字段映射为统一电商语义，通过版本化指标注册表统一 GMV、订单数、支付用户数和客单价口径。
+- **Natural Language → Analysis Plan**：将“为什么 GMV 下降”等问题转换为结构化、白名单内、执行前可审查的分析步骤。
+- **KPI Driver Tree + Drill-down**：对指标变化进行数学驱动拆解，再按渠道、新老用户、品类和商品定位主要贡献来源。
+- **Analysis Run / Reproducibility**：保存数据哈希、语义合同、指标快照、分析计划、结果、证据、结论和验证报告。
+- **电商专题分析**：RFM、顺序漏斗、Cohort、复购与商品表现。
+- **可验证报告**：生成自包含 HTML，并区分事实、比较、数学驱动、候选解释和因果结论。
+
+## 工作流
+
+```text
+CSV/XLSX → 数据质量 → 字段语义确认 → 指标语义层
+         → Analysis Plan → 确定性执行 → KPI 驱动与下钻
+         → Evidence / Claims 验证 → Analysis Run / HTML 报告
+```
+
+大模型不负责计算业务数字，也不能生成任意 Python、Shell 或不受限 SQL。所有执行步骤来自已验证的操作白名单。
+
+## 快速开始
+
+需要 Python 3.9 或更高版本。
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[dev]"
+streamlit run app.py
+```
+
+运行测试：
+
+```bash
+pytest -q
+```
+
+应用中上传 CSV/XLSX，确认字段映射，填写当前期和基准期，查看 Analysis Plan 后执行。正式运行产物保存在 `runs/<run_id>/`，默认不提交到 Git。
+
+## 核心配置
+
+- `configs/field_aliases.yaml`：标准字段及中英文别名；
+- `configs/metric_definitions.yaml`：指标公式、筛选、单位、依赖和版本；
+- `configs/kpi_driver_trees.yaml`：KPI 父子关系与拆解方式；
+- `configs/analysis_templates.yaml`：受允许的分析计划模板。
+
+## 架构
+
+```text
+Streamlit / Python API
+        ↓
+Plan Builder + Validator
+        ↓
+Field Contract + Metric Registry
+        ↓
+Analytics + Driver Tree + Drill-down
+        ↓
+Run Manager + Evidence + Verifier + HTML
+```
+
+## 数据与结论边界
+
+- 没有成本字段，不输出利润或毛利；
+- 没有曝光/访问字段，不输出商品转化率；
+- 未成熟 Cohort 和复购观察窗不记为 0；
+- 数学贡献不等同于因果根因；没有合格识别策略时只输出“贡献来源”或“候选解释”；
+- 原始数据、运行产物、凭据与密钥不会进入版本库。
+
+## My Contributions
+
+- 电商字段和指标语义层；
+- 结构化 Analysis Planner 与安全校验器；
+- KPI Driver Tree、对称乘法拆解和维度贡献下钻；
+- Analysis Run、稳定哈希、证据快照和重放检查；
+- RFM、顺序漏斗、Cohort、复购和商品分析 API；
+- Streamlit 分析工作台、HTML 报告与新增测试。
+
+上游提供的原始分析 Skill、确定性算子、真实性验证规则和参考方法不属于上述新增内容。详细对照见 [NOTICE.md](NOTICE.md)。
+
+## 当前范围
+
+当前版本优先保证 Pandas 计算正确性、证据追溯和核心业务链路。DuckDB、MySQL、Docker 和复杂 PII 识别属于后续增强项，未列为当前已完成功能。
+
+---
+
+## 上游项目原始说明
+
+### 欢迎关注
 
 本项目由小马学数分开发完成
 

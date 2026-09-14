@@ -1,0 +1,15 @@
+templates:
+  gmv_change:
+    objective: 定位GMV变化的主要可观测驱动
+    target_metric: gmv
+    steps:
+      - {id: step_01, op: metric_compare, metric: gmv}
+      - {id: step_02, op: driver_tree_decompose, tree: gmv_v1}
+      - {id: step_03, op: contribution, dimensions: [channel, customer_type]}
+      - {id: step_04, op: drilldown, dimensions: [category_id, product_id], top_n: 10}
+  overview:
+    objective: 汇总核心经营指标
+    target_metric: gmv
+    steps:
+      - {id: step_01, op: metric_summary, metric: gmv}
+      - {id: step_02, op: product_performance, dimensions: [category_id], top_n: 10}

@@ -1,0 +1,12 @@
+fields:
+  user_id: [user_id, userid, uid, buyer_id, 用户编号, 用户id]
+  order_id: [order_id, trade_no, 订单编号, 订单id]
+  event_time: [event_time, pay_time, timestamp, gmt_create, 行为时间, 支付时间, 日期]
+  event_type: [event_type, behavior, action, 行为类型]
+  product_id: [product_id, item_id, sku_id, 商品编号]
+  category_id: [category_id, category, cat_id, 品类编号, 品类]
+  quantity: [quantity, qty, 购买数量, 件数]
+  amount: [amount, pay_amt, sales, gmv, 支付金额, 销售额]
+  order_status: [order_status, status, trade_status, 订单状态, 支付状态]
+  channel: [channel, source, utm_source, 渠道, 来源]
+  customer_type: [customer_type, user_type, 新老用户, 用户类型]

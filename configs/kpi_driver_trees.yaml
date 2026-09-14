@@ -1,0 +1,14 @@
+trees:
+  gmv_v1:
+    metric: gmv
+    relation: multiply
+    children:
+      - metric: paid_users
+      - metric: gmv_per_paid_user
+  gmv_user_order_v1:
+    metric: gmv
+    relation: multiply
+    children:
+      - metric: paid_users
+      - metric: orders_per_paid_user
+      - metric: aov
