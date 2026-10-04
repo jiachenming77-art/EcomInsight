@@ -2,7 +2,7 @@
 
 **面向电商场景的证据驱动 AI 商业分析 Copilot。**
 
-EcomInsight 基于 [xiaomaxueshufen/data-analysis](https://github.com/xiaomaxueshufen/data-analysis) 二次开发。它把业务问题转换为受约束的分析计划，通过统一指标语义层执行确定性计算，并为每个关键结果保留可复现证据。项目仅用于非商业学习、研究和个人作品集，完整许可与贡献边界见 [LICENSE](LICENSE) 和 [NOTICE.md](NOTICE.md)。
+EcomInsight 把业务问题转换为受约束的分析计划，通过统一指标语义层执行确定性计算，并为每个关键结果保留可复现证据。项目仅用于非商业学习、研究和个人作品集，完整许可与贡献边界见 [LICENSE](LICENSE) 和 [NOTICE.md](NOTICE.md)。
 
 ## EcomInsight 新增能力
 
