@@ -1,9 +1,10 @@
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from ecominsight.evidence import verify
-from ecominsight.models import Claim
+from ecominsight.models import AnalysisPlan, Claim, PlanStep
 from ecominsight.pipeline import EcomInsightPipeline
 from ecominsight.planning import contains_code_injection
 
@@ -33,6 +34,33 @@ def test_pipeline_creates_replayable_run(tmp_path, orders):
     assert (run_dir / "report.html").stat().st_size > 4000
     frame, _, _ = pipe.prepare(orders)
     assert pipe.runs.replay_check(output["run_id"], frame)["replayable"] is True
+
+
+def test_behavior_only_funnel_creates_report(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "configs").symlink_to(ROOT / "configs", target_is_directory=True)
+    pipe = EcomInsightPipeline(project)
+    events = pd.DataFrame({
+        "user_id": ["u1", "u1", "u1", "u2", "u2"],
+        "event_type": ["view", "cart", "pay", "pay", "view"],
+        "event_time": pd.to_datetime(["2026-07-01 10:00", "2026-07-01 10:05", "2026-07-01 10:10", "2026-07-01 09:00", "2026-07-01 10:00"]),
+    })
+    plan = AnalysisPlan(
+        question="分析行为漏斗",
+        objective="分析行为漏斗转化",
+        target_metric="event_users",
+        steps=[PlanStep(id="module_funnel", op="funnel", dimensions=["view", "cart", "pay"])],
+        required_fields=["user_id", "event_time", "event_type"],
+    )
+
+    output = pipe.execute(events, plan)
+
+    assert output["status"] == "completed"
+    assert output["verification"]["status"] == "pass"
+    assert output["results"]["summary"]["event_users"] == 2
+    assert [step["users"] for step in output["results"]["summary"]["funnel"]["stages"]] == [2, 1, 1]
+    assert (project / "runs" / output["run_id"] / "report.html").stat().st_size > 4000
 
 
 def test_unsupported_causal_claim_fails():

@@ -57,7 +57,8 @@ class EcomInsightPipeline:
             self.runs.update_status(manifest, RunStatus.blocked, "data quality gate blocked execution")
             return {"run_id": manifest.run_id, "status": "blocked", "quality": quality}
         self.runs.update_status(manifest, RunStatus.running)
-        results: Dict[str, Any] = {"summary": self.registry.compute_many(frame, ["gmv", "paid_orders", "paid_users", "aov"])}
+        summary_metrics = ["gmv", "paid_orders", "paid_users", "aov"] if plan.target_metric == "gmv" else [plan.target_metric]
+        results: Dict[str, Any] = {"summary": self.registry.compute_many(frame, summary_metrics)}
         evidence = []
         try:
             for step in plan.steps:
@@ -83,6 +84,8 @@ class EcomInsightPipeline:
                     result = product_performance(frame, dimension, step.top_n)
                 elif step.op == "funnel":
                     result = funnel_analysis(frame, step.dimensions)
+                    if plan.target_metric == "event_users":
+                        results["summary"]["funnel"] = result
                 else:
                     result = {"status": "not_implemented", "op": step.op}
                 results[step.id + "_" + step.op] = result

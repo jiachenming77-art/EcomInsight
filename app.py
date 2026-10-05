@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from ecominsight.models import PlanStep, SemanticContract
+from ecominsight.models import AnalysisPlan, PlanStep, SemanticContract
 from ecominsight.pipeline import EcomInsightPipeline
 
 ROOT = Path(__file__).resolve().parent
@@ -64,36 +64,63 @@ else:
     st.success("未发现规则覆盖范围内的数据质量问题。")
 
 st.subheader("4. 分析问题与计划")
-question = st.text_input("业务问题", "为什么 8 月 GMV 比 7 月下降？")
+order_fields = {"user_id", "order_id", "event_time", "amount"}
+question = st.text_input("业务问题", "为什么 8 月 GMV 比 7 月下降？" if order_fields.issubset(frame.columns) else "分析 view → cart → pay 行为漏斗")
 col1, col2 = st.columns(2)
 current_start = col1.date_input("当前期开始")
 current_end = col1.date_input("当前期结束")
 baseline_start = col2.date_input("基准期开始")
 baseline_end = col2.date_input("基准期结束")
-plan = pipe.build_plan(
-    question,
-    [current_start.isoformat(), current_end.isoformat()],
-    [baseline_start.isoformat(), baseline_end.isoformat()],
-)
 available_modules = st.multiselect(
     "附加专题分析",
     ["RFM 用户分层", "Cohort 留存", "复购分析", "商品表现", "行为漏斗"],
 )
+if order_fields.issubset(frame.columns) or not available_modules:
+    plan = pipe.build_plan(
+        question,
+        [current_start.isoformat(), current_end.isoformat()],
+        [baseline_start.isoformat(), baseline_end.isoformat()],
+    )
+else:
+    plan = AnalysisPlan(
+        question=question,
+        objective="分析行为漏斗转化" if available_modules == ["行为漏斗"] else "分析行为数据专题",
+        target_metric="event_users",
+        steps=[],
+        required_fields=["user_id"],
+    )
 module_steps = {
     "RFM 用户分层": PlanStep(id="module_rfm", op="rfm"),
     "Cohort 留存": PlanStep(id="module_cohort", op="cohort"),
     "复购分析": PlanStep(id="module_repurchase", op="repurchase"),
     "商品表现": PlanStep(id="module_product", op="product_performance", dimensions=["product_id"]),
 }
+module_required_fields = {
+    "RFM 用户分层": {"user_id", "order_id", "event_time", "amount"},
+    "Cohort 留存": {"user_id", "event_time"},
+    "复购分析": {"user_id", "order_id", "event_time"},
+    "商品表现": {"product_id", "order_id", "user_id", "amount"},
+    "行为漏斗": {"user_id", "event_time", "event_type"},
+}
 for module in available_modules:
     if module in module_steps:
         plan.steps.append(module_steps[module])
+    plan.required_fields = sorted(set(plan.required_fields) | module_required_fields[module])
+funnel_stages = []
 if "行为漏斗" in available_modules:
     stage_text = st.text_input("漏斗阶段（按顺序，以英文逗号分隔）", "view,cart,pay")
-    plan.steps.append(PlanStep(id="module_funnel", op="funnel", dimensions=[item.strip() for item in stage_text.split(",") if item.strip()]))
+    funnel_stages = [item.strip() for item in stage_text.split(",") if item.strip()]
+    plan.steps.append(PlanStep(id="module_funnel", op="funnel", dimensions=funnel_stages))
 st.json(plan.model_dump(mode="json"))
 
-if st.button("执行分析", type="primary", disabled=quality["blocking"]):
+missing_fields = set(plan.required_fields) - set(frame.columns)
+if missing_fields:
+    st.warning(f"缺少分析所需字段：{', '.join(sorted(missing_fields))}")
+invalid_funnel = "行为漏斗" in available_modules and len(funnel_stages) < 2
+if invalid_funnel:
+    st.warning("行为漏斗至少需要两个阶段。")
+can_run = not (quality["blocking"] or missing_fields or invalid_funnel) and bool(plan.steps)
+if st.button("执行分析", type="primary", disabled=not can_run):
     with st.spinner("正在执行确定性分析并生成证据……"):
         output = pipe.execute(raw, plan, contract)
     st.success(f"运行完成：{output['run_id']}")

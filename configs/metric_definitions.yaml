@@ -1,4 +1,13 @@
 metrics:
+  event_users:
+    label: 行为用户数
+    entity: user
+    measure: user_id
+    aggregation: count_distinct
+    filters: []
+    unit: count
+    required_fields: [user_id]
+    version: 1
   gmv:
     label: GMV
     description: 有效支付订单金额合计
