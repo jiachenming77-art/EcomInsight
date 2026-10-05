@@ -90,14 +90,8 @@ Run Manager + Evidence + Verifier + HTML
 
 ## 上游项目原始说明
 
-### 欢迎关注
 
-本项目由小马学数分开发完成
-
-- [小红书主页](https://www.xiaohongshu.com/user/profile/6535d6c9000000000d005c77)
-- [Bilibili 主页](https://space.bilibili.com/503535342)
-
-本项目遵循 [PolyForm Noncommercial License 1.0.0](LICENSE)：非商用目的可自由使用、修改与分享，未经授权不得用于商业用途。王狗不得入内！
+本项目遵循 [PolyForm Noncommercial License 1.0.0](LICENSE)：非商用目的可自由使用、修改与分享，未经授权不得用于商业用途。
 
 # Data Analysis Skill
 
@@ -182,14 +176,14 @@ outputs/<run>/
 
 本 skill 已发布到 GitHub，仓库根目录包含 `SKILL.md`：
 
-- 仓库地址：[https://github.com/xiaomaxueshufen/data-analysis](https://github.com/xiaomaxueshufen/data-analysis)
+- 仓库地址：[https://github.com/jiachenming77-art/EcomInsight](https://github.com/jiachenming77-art/EcomInsight)
 
 ### 方式一：在 Codex 中直接安装（推荐）
 
 1. 打开 Codex（桌面版、CLI 或 IDE 扩展均可），新建一个会话。
 2. 让 Codex 用内置安装器安装，直接发送：
 
-   > 请安装 data-analysis skill，仓库来源是 https://github.com/xiaomaxueshufen/data-analysis
+   > 请安装 data-analysis skill，仓库来源是 https://github.com/jiachenming77-art/EcomInsight
 
    也可以先输入 `$skill-installer`，再把上面的仓库地址交给它。
 3. 等待安装完成。Codex 通常会自动识别新 skill；如果输入 `$data-analysis` 时没有出现，请重启 Codex 或新建一个会话。
@@ -198,7 +192,7 @@ outputs/<run>/
 
 如果当前版本的内置安装器不可用，可以把仓库内容手动放到 Codex 的 user skills 目录：
 
-1. 下载或克隆仓库：`https://github.com/xiaomaxueshufen/data-analysis`
+1. 下载或克隆仓库：`https://github.com/jiachenming77-art/EcomInsight`
 2. 将仓库根目录（包含 `SKILL.md`、`scripts/`、`references/`）放到 Codex 的 user skills 目录下，目录名保持为 `data-analysis`。
 3. 重启 Codex 或新建会话。
 
@@ -251,3 +245,4 @@ pip install -r requirements.txt
 项目不携带示例数据或运行缓存；`examples/` 仅保留不参与运行时的展示报告。
 
 没有时间列、没有基线、没有分子分母、实验 SRM 失败、因果没有可比对照或核心字段被数据质量事故污染时，skill 会停止对应分析或降级为结构画像、质量报告、关联性诊断和实验设计建议。
+
